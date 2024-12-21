@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            height: 100vh;
+        }
+
+        /* Chat container styling */
+        .chat-container {
+            max-width: 600px;
+            width: 100%;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header section */
+        .header {
+            background-color: #0077b6;
+            padding: 15px;
+            text-align: center;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Chat box for displaying conversation */
+        #chat-box {
+            padding: 20px;
+            height: 400px;
+            overflow-y: scroll;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Styling for individual messages */
+        .message {
+            padding: 10px;
+            border-radius: 20px;
+            max-width: 80%;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .user-message {
+            background-color: #00b4d8;
+            align-self: flex-end;
+            color: white;
+        }
+
+        .bot-message {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+            color: #333;
+        }
+
+        /* Input section */
+        .input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        #user-input {
+            width: 85%;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            width: 15%;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            background-color: #00b4d8;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0077b6;
+        }
+
+        /* Smooth scrolling */
+        #chat-box {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="header">
+            Zephyra Chatbot
+        </div>
+
+        <div id="chat-box">
+            <!-- Chat messages will appear here -->
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userMessage = document.getElementById("user-input").value;
+            if (userMessage.trim() === "") return;
+
+            // Display user message
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="message user-message">${userMessage}</div>`;
+
+            // Send message to the server (POST request)
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `msg=${userMessage}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display bot response
+                chatBox.innerHTML += `<div class="message bot-message">${data.response}</div>`;
+                document.getElementById("user-input").value = ''; // Clear input field
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom of chat
+            });
+        }
+
+        // Optional: Enable "Enter" key to send message
+        document.getElementById("user-input").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+
+</body>
+</html>
